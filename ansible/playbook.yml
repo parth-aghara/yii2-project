@@ -1,0 +1,44 @@
+---
+- name: Setup EC2 for Yii2 App
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Required Packages
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - nginx
+          - git
+          - php
+          - php-mysql
+        state: latest
+        update_cache: yes
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Initialize Docker Swarm
+      shell: docker swarm init
+      ignore_errors: yes
+
+    - name: Copy NGINX Config
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/sites-available/default
+        mode: '0644'
+
+    - name: Restart NGINX
+      systemd:
+        name: nginx
+        state: restarted
+
+    - name: Deploy Yii2 App Service
+      shell: |
+        docker service create --name yii2-service           --publish 8080:80           yourdockerhubusername/yii2-app:latest
+      args:
+        warn: false
