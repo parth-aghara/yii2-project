@@ -39,6 +39,6 @@
 
     - name: Deploy Yii2 App Service
       shell: |
-        docker service create --name yii2-service           --publish 8080:80           yourdockerhubusername/yii2-app:latest
+        docker service create --name yii2-service --publish 8080:80 parthaghara67/yii2-app:latest
       args:
         warn: false
